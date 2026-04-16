@@ -1,0 +1,3 @@
+[console_scripts]
+velocity_publisher = locus_basics.velocity_publisher:main
+velocity_subscriber = locus_basics.velocity_subscriber:main

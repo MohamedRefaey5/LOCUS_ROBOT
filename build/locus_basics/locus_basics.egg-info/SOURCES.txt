@@ -1,0 +1,17 @@
+package.xml
+setup.cfg
+setup.py
+../../build/locus_basics/locus_basics.egg-info/PKG-INFO
+../../build/locus_basics/locus_basics.egg-info/SOURCES.txt
+../../build/locus_basics/locus_basics.egg-info/dependency_links.txt
+../../build/locus_basics/locus_basics.egg-info/entry_points.txt
+../../build/locus_basics/locus_basics.egg-info/requires.txt
+../../build/locus_basics/locus_basics.egg-info/top_level.txt
+../../build/locus_basics/locus_basics.egg-info/zip-safe
+locus_basics/__init__.py
+locus_basics/velocity_publisher.py
+locus_basics/velocity_subscriber.py
+resource/locus_basics
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py
