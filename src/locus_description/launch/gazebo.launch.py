@@ -4,30 +4,28 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
     pkg_locus_description = get_package_share_directory('locus_description')
-    # Use ros_gz_sim instead of gazebo_ros
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     urdf_file = os.path.join(pkg_locus_description, 'urdf', 'locus_robot.urdf.xacro')
-    
-    # Jazzy/Harmonic uses .sdf or .world files. 
-    # If your world file is empty, 'empty.sdf' is a safe default for Harmonic.
-    world_file = os.path.join(pkg_locus_description, 'worlds', 'empty.world') 
 
-    robot_description = Command(['xacro ', urdf_file])
+    robot_description = ParameterValue(
+        Command(['xacro ', urdf_file]),
+        value_type=str
+    )
 
     return LaunchDescription([
 
-        # 1. Launch Gazebo Harmonic (Jazzy's default)
+        # 1. Launch Gazebo Harmonic
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
             ),
-            # '-r' tells Gazebo to run the physics immediately
             launch_arguments={'gz_args': '-r empty.sdf'}.items()
         ),
 
@@ -42,7 +40,7 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # 3. Spawn robot in Gazebo Sim
+        # 3. Spawn robot in Gazebo
         Node(
             package='ros_gz_sim',
             executable='create',
@@ -53,20 +51,19 @@ def generate_launch_description():
             ],
             output='screen'
         ),
-        
-        # 4. Bridge (Crucial for Jazzy!)
-        # This allows ROS 2 and Gazebo to talk to each other
-        # In your launch file:
-	Node(
-    	package='ros_gz_bridge',
-    	executable='parameter_bridge',
-    	arguments=[
-        	'/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-        	'/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
-        	'/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
-        	'/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-        	'/imu@sensor_msgs/msg/Imu[gz.msgs.IMU'
-    	],
-    	output='screen'
-	)
+
+        # 4. Bridge ROS <-> Gazebo topics
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            arguments=[
+                '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+                '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
+                '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+                '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+                '/imu@sensor_msgs/msg/Imu[gz.msgs.IMU',
+                '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
+            ],
+            output='screen'
+        )
     ])
