@@ -84,20 +84,20 @@
   <xacro:wheel name="rear_left"   x="${-wheel_base/2}" y="${track_width/2}"/>
   <xacro:wheel name="rear_right"  x="${-wheel_base/2}" y="${-track_width/2}"/>
 
+  <!-- lidar_link: no collision block so laser rays are not blocked by own geometry -->
   <link name="lidar_link">
     <visual><geometry><cylinder radius="0.05" length="0.05"/></geometry><material name="grey"/></visual>
-    <collision><geometry><cylinder radius="0.05" length="0.05"/></geometry></collision>
     <inertial><mass value="0.2"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
   </link>
   <joint name="lidar_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="lidar_link"/>
-    <origin xyz="0 0 ${chassis_height + 0.02}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${chassis_height + 0.1}" rpy="0 0 0"/>
   </joint>
 
+  <!-- imu_link: no collision block, it is a sensor not a physical obstacle -->
   <link name="imu_link">
     <visual><geometry><box size="0.03 0.03 0.01"/></geometry><material name="grey"/></visual>
-    <collision><geometry><box size="0.03 0.03 0.01"/></geometry></collision>
     <inertial><mass value="0.02"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
   </link>
   <joint name="imu_joint" type="fixed">

@@ -2,10 +2,8 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <gazebo>
-    <!-- Differential Drive: controls all 4 wheels -->
-    <plugin
-      filename="gz-sim-diff-drive-system"
-      name="gz::sim::systems::DiffDrive">
+    <plugin filename="gz-sim-diff-drive-system"
+            name="gz::sim::systems::DiffDrive">
       <left_joint>front_left_wheel_joint</left_joint>
       <left_joint>rear_left_wheel_joint</left_joint>
       <right_joint>front_right_wheel_joint</right_joint>
@@ -20,30 +18,24 @@
       <max_wheel_acceleration>2.0</max_wheel_acceleration>
     </plugin>
 
-    <!-- Publishes wheel joint states to /joint_states -->
-    <plugin
-      filename="gz-sim-joint-state-publisher-system"
-      name="gz::sim::systems::JointStatePublisher">
+    <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
       <topic>joint_states</topic>
       <update_rate>50</update_rate>
     </plugin>
 
-    <!-- Sensors system: required for LiDAR rendering (only ONE instance) -->
-    <plugin
-      filename="gz-sim-sensors-system"
-      name="gz::sim::systems::Sensors">
-      <render_engine>ogre</render_engine>
+    <!-- ogre2: required for gpu_lidar sensor type -->
+    <plugin filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
     </plugin>
 
-    <!-- IMU system: required to compute IMU sensor data -->
-    <plugin
-      filename="gz-sim-imu-system"
-      name="gz::sim::systems::Imu">
+    <plugin filename="gz-sim-imu-system"
+            name="gz::sim::systems::Imu">
     </plugin>
 
   </gazebo>
 
-  <!-- LiDAR sensor: gz_frame_id removed (not valid inside sensor in Gazebo Harmonic) -->
   <gazebo reference="lidar_link">
     <sensor name="gpu_lidar" type="gpu_lidar">
       <update_rate>10</update_rate>
@@ -51,31 +43,36 @@
       <lidar>
         <scan>
           <horizontal>
-            <samples>640</samples>
+            <samples>360</samples>
             <resolution>1</resolution>
             <min_angle>-3.14159</min_angle>
             <max_angle>3.14159</max_angle>
           </horizontal>
         </scan>
         <range>
-          <min>0.1</min>
+          <min>0.15</min>
           <max>12.0</max>
         </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
       </lidar>
       <visualize>true</visualize>
+      <frame_id>lidar_link</frame_id>
     </sensor>
   </gazebo>
 
-  <!-- IMU sensor: gz_frame_id removed (not valid inside sensor in Gazebo Harmonic) -->
   <gazebo reference="imu_link">
     <sensor name="imu_sensor" type="imu">
       <always_on>true</always_on>
       <update_rate>100</update_rate>
       <topic>imu</topic>
+      <frame_id>imu_link</frame_id>
     </sensor>
   </gazebo>
 
-  <!-- Wheel friction coefficients -->
   <gazebo reference="rear_left_wheel"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
   <gazebo reference="rear_right_wheel"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
   <gazebo reference="front_left_wheel"><mu1>0.8</mu1><mu2>0.8</mu2></gazebo>
