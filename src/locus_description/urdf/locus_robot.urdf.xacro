@@ -106,6 +106,47 @@
     <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
   </joint>
 
+<!-- ============================================================
+       ROS2 CONTROL
+       Defines the hardware interface and joints that ros2_control
+       will manage. In simulation, GazeboSystem talks to Gazebo.
+       On real hardware, you replace GazeboSystem with your
+       actual motor driver interface.
+       ============================================================ -->
+  <ros2_control name="locus_robot" type="system">
+
+    <hardware>
+      <!-- Simulation hardware interface — talks to Gazebo Harmonic -->
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+
+    <!-- Each wheel joint needs velocity command and state interfaces -->
+    <joint name="front_left_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+    <joint name="front_right_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+    <joint name="rear_left_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+    <joint name="rear_right_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+  </ros2_control>
+
   <xacro:include filename="$(find locus_description)/urdf/locus_gazebo.xacro"/>
 
 </robot>

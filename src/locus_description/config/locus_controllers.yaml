@@ -1,0 +1,62 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz — how often controllers run
+
+    # Two controllers we will load:
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+diff_drive_controller:
+  ros__parameters:
+
+    # Wheel joint names — must match URDF exactly
+    left_wheel_names:  ['front_left_wheel_joint',  'rear_left_wheel_joint']
+    right_wheel_names: ['front_right_wheel_joint', 'rear_right_wheel_joint']
+
+    # Physical parameters — must match your URDF properties
+    wheel_separation: 0.5    # track_width in your URDF
+    wheel_radius: 0.06       # wheel_radius in your URDF
+
+
+    # FIX 2: accept plain Twist instead of TwistStamped
+    use_stamped_vel: false
+
+    # Odometry settings
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    pose_covariance_diagonal:     [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal:    [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+
+    # Publishing
+    publish_rate: 50.0
+    odom_only_twist: false
+
+    # PID gains for velocity control on each wheel
+    # P = how aggressively to respond to error
+    # I = how aggressively to correct accumulated error
+    # D = how aggressively to dampen oscillation
+    # Start with these conservative values, tune later if needed
+    left_wheel_radius_multiplier:  1.0
+    right_wheel_radius_multiplier: 1.0
+
+    # Velocity and acceleration limits
+    linear:
+      x:
+        has_velocity_limits:     true
+        max_velocity:            0.5   # m/s
+        min_velocity:           -0.5
+        has_acceleration_limits: true
+        max_acceleration:        1.0   # m/s²
+        min_acceleration:       -1.0
+
+    angular:
+      z:
+        has_velocity_limits:     true
+        max_velocity:            1.0   # rad/s
+        min_velocity:           -1.0
+        has_acceleration_limits: true
+        max_acceleration:        1.5
+        min_acceleration:       -1.5
