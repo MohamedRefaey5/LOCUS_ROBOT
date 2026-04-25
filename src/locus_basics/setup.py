@@ -23,9 +23,10 @@ setup(
         ],
     },
     entry_points={
-    'console_scripts': [
-        'velocity_publisher = locus_basics.velocity_publisher:main',
-        'velocity_subscriber = locus_basics.velocity_subscriber:main',
-    ],
-},
+        'console_scripts': [
+            'velocity_publisher = locus_basics.velocity_publisher:main',
+            'velocity_subscriber = locus_basics.velocity_subscriber:main',
+            'cmd_vel_relay = locus_basics.cmd_vel_relay:main',
+        ],
+    },
 )

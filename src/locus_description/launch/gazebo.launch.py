@@ -21,7 +21,7 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        # 1. Launch Gazebo Harmonic
+        # 1. Launch Gazebo Harmonic with custom world
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
@@ -29,7 +29,7 @@ def generate_launch_description():
             launch_arguments={'gz_args': f'-r {world_file}'}.items()
         ),
 
-        # 2. Robot State Publisher
+        # 2. Robot State Publisher — publishes TF transforms from URDF
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -40,21 +40,20 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # 3. Spawn robot in Gazebo
+        # 3. Spawn robot into Gazebo
         Node(
             package='ros_gz_sim',
             executable='create',
             arguments=[
                 '-topic', 'robot_description',
                 '-name', 'locus_robot',
-                '-z', '0.1',
+                '-z', '0.0',
             ],
             output='screen'
         ),
 
-        # 4. Bridge ROS <-> Gazebo
-        # Note: /joint_states and /odom now come from ros2_control,
-        # not from Gazebo directly — so we removed those from the bridge
+        # 4. Bridge Gazebo topics to ROS2
+        # /cmd_vel and /odom are handled by ros2_control now, not bridged
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
@@ -66,7 +65,9 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # 5. Fix lidar frame_id mismatch
+        # 5. Fix LiDAR frame ID mismatch
+        # Gazebo auto-generates frame name, this static transform connects it
+        # to lidar_link in the TF tree so RViz2 can display scan correctly
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
@@ -81,38 +82,56 @@ def generate_launch_description():
         ),
 
         # 6. Joint State Broadcaster
-        # Reads joint states from hardware and publishes /joint_states
-        # Delayed 3 seconds to let Gazebo finish loading first
+        # Reads actual joint positions from ros2_control hardware interface
+        # and publishes them to /joint_states for robot_state_publisher
         TimerAction(
             period=3.0,
             actions=[
                 Node(
                     package='controller_manager',
                     executable='spawner',
-                    arguments=['joint_state_broadcaster'],
+                    arguments=[
+                        'joint_state_broadcaster',
+                        '--controller-manager', '/controller_manager'
+                    ],
                     output='screen'
                 )
             ]
         ),
 
         # 7. Diff Drive Controller
-        # Reads /cmd_vel and controls wheel velocities with PID
-        # Delayed 3 seconds to let Gazebo finish loading first
-        # 7. Diff Drive Controller with topic remapping
-	TimerAction(
-	    period=3.0,
-	    actions=[
-	        Node(
-	            package='controller_manager',
-        	    executable='spawner',
-          	  arguments=[
-                	'diff_drive_controller',
-                	'--ros-args',
-                	'--remap', '/diff_drive_controller/cmd_vel:=/cmd_vel'
-            	],
-           	 output='screen'
-      	  )
-   	 ]
-	),
+        # Receives wheel velocity commands from cmd_vel_relay
+        # and sends them to the hardware interface (Gazebo)
+        TimerAction(
+            period=3.0,
+            actions=[
+                Node(
+                    package='controller_manager',
+                    executable='spawner',
+                    arguments=[
+                        'diff_drive_controller',
+                        '--controller-manager', '/controller_manager'
+                    ],
+                    output='screen'
+                )
+            ]
+        ),
+
+        # 8. cmd_vel relay node
+        # Teleop publishes plain Twist on /cmd_vel
+        # Controller expects TwistStamped on /diff_drive_controller/cmd_vel
+        # This node subscribes to /cmd_vel, converts, and republishes
+        TimerAction(
+            period=5.0,
+            actions=[
+                Node(
+                    package='locus_basics',
+                    executable='cmd_vel_relay',
+                    name='cmd_vel_relay',
+                    parameters=[{'use_sim_time': True}],
+                    output='screen'
+                )
+            ]
+        ),
 
     ])

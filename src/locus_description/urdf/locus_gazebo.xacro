@@ -65,10 +65,81 @@
     </sensor>
   </gazebo>
 
-  <!-- Wheel friction -->
-  <gazebo reference="rear_left_wheel"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
-  <gazebo reference="rear_right_wheel"><mu1>1.0</mu1><mu2>1.0</mu2></gazebo>
-  <gazebo reference="front_left_wheel"><mu1>0.8</mu1><mu2>0.8</mu2></gazebo>
-  <gazebo reference="front_right_wheel"><mu1>0.8</mu1><mu2>0.8</mu2></gazebo>
+ 
+<!-- Wheel friction — Gazebo Harmonic -->
+<!-- torsional friction = 0 prevents wheels from resisting spinning in place -->
+<!-- This is the standard fix for differential drive turning issues -->
+
+<gazebo reference="front_left_wheel">
+  <collision>
+    <surface>
+      <friction>
+        <ode>
+          <mu>1.0</mu>
+          <mu2>1.0</mu2>
+        </ode>
+        <torsional>
+          <coefficient>0.0</coefficient>
+          <use_patch_radius>false</use_patch_radius>
+          <patch_radius>0.0</patch_radius>
+        </torsional>
+      </friction>
+    </surface>
+  </collision>
+</gazebo>
+
+<gazebo reference="front_right_wheel">
+  <collision>
+    <surface>
+      <friction>
+        <ode>
+          <mu>1.0</mu>
+          <mu2>1.0</mu2>
+        </ode>
+        <torsional>
+          <coefficient>0.0</coefficient>
+          <use_patch_radius>false</use_patch_radius>
+          <patch_radius>0.0</patch_radius>
+        </torsional>
+      </friction>
+    </surface>
+  </collision>
+</gazebo>
+
+<gazebo reference="rear_left_wheel">
+  <collision>
+    <surface>
+      <friction>
+        <ode>
+          <mu>1.0</mu>
+          <mu2>1.0</mu2>
+        </ode>
+        <torsional>
+          <coefficient>0.0</coefficient>
+          <use_patch_radius>false</use_patch_radius>
+          <patch_radius>0.0</patch_radius>
+        </torsional>
+      </friction>
+    </surface>
+  </collision>
+</gazebo>
+
+<gazebo reference="rear_right_wheel">
+  <collision>
+    <surface>
+      <friction>
+        <ode>
+          <mu>1.0</mu>
+          <mu2>1.0</mu2>
+        </ode>
+        <torsional>
+          <coefficient>0.0</coefficient>
+          <use_patch_radius>false</use_patch_radius>
+          <patch_radius>0.0</patch_radius>
+        </torsional>
+      </friction>
+    </surface>
+  </collision>
+</gazebo>
 
 </robot>
