@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 50
+    update_rate: 100  # Hz
 
     diff_drive_controller:
       type: diff_drive_controller/DiffDriveController
@@ -10,29 +10,46 @@ controller_manager:
 
 diff_drive_controller:
   ros__parameters:
-    left_wheel_names:  ['front_left_wheel_joint',  'rear_left_wheel_joint']
-    right_wheel_names: ['front_right_wheel_joint', 'rear_right_wheel_joint']
-    wheel_separation: 0.5
-    wheel_radius: 0.1
-    cmd_vel_timeout: 1.0
+
+    # Joint names — must match URDF exactly (2WD only)
+    left_wheel_names:  ['left_wheel_joint']
+    right_wheel_names: ['right_wheel_joint']
+
+    # Physical parameters — must match URDF
+    wheel_separation: 0.30   # track_width in URDF
+    wheel_radius: 0.05       # wheel_radius in URDF
+
+    # Odometry frames
     odom_frame_id: odom
     base_frame_id: base_footprint
+    enable_odom_tf: true
+
+    # Publish odometry covariance
     pose_covariance_diagonal:  [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+
     publish_rate: 50.0
     odom_only_twist: false
+
+    # Wheel multipliers
     left_wheel_radius_multiplier:  1.0
     right_wheel_radius_multiplier: 1.0
-    enable_odom_tf: true
+
+    # Timeout: stop if no cmd_vel received within this time
+    cmd_vel_timeout: 0.5
+
+    # Velocity limits
     linear:
       x:
         has_velocity_limits:     true
-        max_velocity:            0.5
+        max_velocity:            0.5    # m/s
         min_velocity:           -0.5
         has_acceleration_limits: false
+
     angular:
       z:
         has_velocity_limits:     true
-        max_velocity:            2.0
+        max_velocity:            2.0    # rad/s
         min_velocity:           -2.0
         has_acceleration_limits: false
+
