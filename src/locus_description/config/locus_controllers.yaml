@@ -14,8 +14,7 @@ diff_drive_controller:
     right_wheel_names: ['front_right_wheel_joint', 'rear_right_wheel_joint']
     wheel_separation: 0.5
     wheel_radius: 0.1
-    cmd_vel_timeout: 0.5
-    use_stamped_vel: false
+    cmd_vel_timeout: 1.0
     odom_frame_id: odom
     base_frame_id: base_footprint
     pose_covariance_diagonal:  [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
@@ -24,14 +23,13 @@ diff_drive_controller:
     odom_only_twist: false
     left_wheel_radius_multiplier:  1.0
     right_wheel_radius_multiplier: 1.0
+    enable_odom_tf: true
     linear:
       x:
         has_velocity_limits:     true
         max_velocity:            0.5
         min_velocity:           -0.5
-        has_acceleration_limits: true
-        max_acceleration:        2.0
-        min_acceleration:       -2.0
+        has_acceleration_limits: false
     angular:
       z:
         has_velocity_limits:     true

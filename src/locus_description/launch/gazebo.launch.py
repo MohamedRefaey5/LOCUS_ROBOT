@@ -21,7 +21,7 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        # 1. Launch Gazebo Harmonic with custom world
+        # 1. Gazebo Harmonic
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
@@ -29,7 +29,7 @@ def generate_launch_description():
             launch_arguments={'gz_args': f'-r {world_file}'}.items()
         ),
 
-        # 2. Robot State Publisher — publishes TF transforms from URDF
+        # 2. Robot State Publisher
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -40,20 +40,19 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # 3. Spawn robot into Gazebo
+        # 3. Spawn robot
         Node(
             package='ros_gz_sim',
             executable='create',
             arguments=[
                 '-topic', 'robot_description',
                 '-name', 'locus_robot',
-                '-z', '0.0',
+                '-z', '0.1',
             ],
             output='screen'
         ),
 
-        # 4. Bridge Gazebo topics to ROS2
-        # /cmd_vel and /odom are handled by ros2_control now, not bridged
+        # 4. Bridge — only sensors, odom/tf come from ros2_control
         Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
@@ -65,9 +64,7 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # 5. Fix LiDAR frame ID mismatch
-        # Gazebo auto-generates frame name, this static transform connects it
-        # to lidar_link in the TF tree so RViz2 can display scan correctly
+        # 5. Fix lidar frame_id
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
@@ -82,8 +79,6 @@ def generate_launch_description():
         ),
 
         # 6. Joint State Broadcaster
-        # Reads actual joint positions from ros2_control hardware interface
-        # and publishes them to /joint_states for robot_state_publisher
         TimerAction(
             period=3.0,
             actions=[
@@ -99,9 +94,7 @@ def generate_launch_description():
             ]
         ),
 
-        # 7. Diff Drive Controller
-        # Receives wheel velocity commands from cmd_vel_relay
-        # and sends them to the hardware interface (Gazebo)
+        # 7. Diff Drive Controller — publishes odom TF and /odom topic
         TimerAction(
             period=3.0,
             actions=[
@@ -110,17 +103,19 @@ def generate_launch_description():
                     executable='spawner',
                     arguments=[
                         'diff_drive_controller',
-                        '--controller-manager', '/controller_manager'
+                        '--controller-manager', '/controller_manager',
+                        '--param-file',
+                        os.path.join(
+                            get_package_share_directory('locus_description'),
+                            'config', 'locus_controllers.yaml'
+                        )
                     ],
                     output='screen'
                 )
             ]
         ),
 
-        # 8. cmd_vel relay node
-        # Teleop publishes plain Twist on /cmd_vel
-        # Controller expects TwistStamped on /diff_drive_controller/cmd_vel
-        # This node subscribes to /cmd_vel, converts, and republishes
+        # 8. cmd_vel relay: Twist -> TwistStamped
         TimerAction(
             period=5.0,
             actions=[

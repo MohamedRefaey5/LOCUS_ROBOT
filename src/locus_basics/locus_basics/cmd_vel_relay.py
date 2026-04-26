@@ -1,13 +1,11 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy
 from geometry_msgs.msg import Twist, TwistStamped
 
 class CmdVelRelay(Node):
     def __init__(self):
         super().__init__('cmd_vel_relay')
 
-        # Tell this node to use simulation time
         self.set_parameters([
             rclpy.parameter.Parameter(
                 'use_sim_time',
@@ -29,11 +27,13 @@ class CmdVelRelay(Node):
             10
         )
 
-        self.get_logger().info('cmd_vel_relay ready')
+        self.get_logger().info(
+            'cmd_vel_relay ready: /cmd_vel (Twist) -> '
+            '/diff_drive_controller/cmd_vel (TwistStamped)'
+        )
 
     def callback(self, msg):
         stamped = TwistStamped()
-        # Use simulation clock — CRITICAL for ros2_control with use_sim_time
         stamped.header.stamp = self.get_clock().now().to_msg()
         stamped.header.frame_id = 'base_footprint'
         stamped.twist.linear.x  = msg.linear.x

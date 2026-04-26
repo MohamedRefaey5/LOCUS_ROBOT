@@ -2,9 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <gazebo>
-    <!-- ros2_control plugin: replaces the old DiffDrive plugin.
-         Connects Gazebo physics to the ros2_control hardware interface.
-         The actual control logic lives in the controller (see yaml config). -->
+    <!-- gz_ros2_control: publishes odom TF and joint states via controllers -->
     <plugin filename="gz_ros2_control-system"
             name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>$(find locus_description)/config/locus_controllers.yaml</parameters>
@@ -13,13 +11,11 @@
       </ros>
     </plugin>
 
-    <!-- Sensors system: required for LiDAR and IMU rendering -->
     <plugin filename="gz-sim-sensors-system"
             name="gz::sim::systems::Sensors">
       <render_engine>ogre2</render_engine>
     </plugin>
 
-    <!-- IMU system -->
     <plugin filename="gz-sim-imu-system"
             name="gz::sim::systems::Imu">
     </plugin>
@@ -65,81 +61,65 @@
     </sensor>
   </gazebo>
 
- 
-<!-- Wheel friction — Gazebo Harmonic -->
-<!-- torsional friction = 0 prevents wheels from resisting spinning in place -->
-<!-- This is the standard fix for differential drive turning issues -->
+  <!-- Wheel friction with torsional = 0 -->
+  <gazebo reference="front_left_wheel">
+    <collision>
+      <surface>
+        <friction>
+          <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          <torsional>
+            <coefficient>0.0</coefficient>
+            <use_patch_radius>false</use_patch_radius>
+            <patch_radius>0.0</patch_radius>
+          </torsional>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
 
-<gazebo reference="front_left_wheel">
-  <collision>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-        <torsional>
-          <coefficient>0.0</coefficient>
-          <use_patch_radius>false</use_patch_radius>
-          <patch_radius>0.0</patch_radius>
-        </torsional>
-      </friction>
-    </surface>
-  </collision>
-</gazebo>
+  <gazebo reference="front_right_wheel">
+    <collision>
+      <surface>
+        <friction>
+          <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          <torsional>
+            <coefficient>0.0</coefficient>
+            <use_patch_radius>false</use_patch_radius>
+            <patch_radius>0.0</patch_radius>
+          </torsional>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
 
-<gazebo reference="front_right_wheel">
-  <collision>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-        <torsional>
-          <coefficient>0.0</coefficient>
-          <use_patch_radius>false</use_patch_radius>
-          <patch_radius>0.0</patch_radius>
-        </torsional>
-      </friction>
-    </surface>
-  </collision>
-</gazebo>
+  <gazebo reference="rear_left_wheel">
+    <collision>
+      <surface>
+        <friction>
+          <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          <torsional>
+            <coefficient>0.0</coefficient>
+            <use_patch_radius>false</use_patch_radius>
+            <patch_radius>0.0</patch_radius>
+          </torsional>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
 
-<gazebo reference="rear_left_wheel">
-  <collision>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-        <torsional>
-          <coefficient>0.0</coefficient>
-          <use_patch_radius>false</use_patch_radius>
-          <patch_radius>0.0</patch_radius>
-        </torsional>
-      </friction>
-    </surface>
-  </collision>
-</gazebo>
-
-<gazebo reference="rear_right_wheel">
-  <collision>
-    <surface>
-      <friction>
-        <ode>
-          <mu>1.0</mu>
-          <mu2>1.0</mu2>
-        </ode>
-        <torsional>
-          <coefficient>0.0</coefficient>
-          <use_patch_radius>false</use_patch_radius>
-          <patch_radius>0.0</patch_radius>
-        </torsional>
-      </friction>
-    </surface>
-  </collision>
-</gazebo>
+  <gazebo reference="rear_right_wheel">
+    <collision>
+      <surface>
+        <friction>
+          <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+          <torsional>
+            <coefficient>0.0</coefficient>
+            <use_patch_radius>false</use_patch_radius>
+            <patch_radius>0.0</patch_radius>
+          </torsional>
+        </friction>
+      </surface>
+    </collision>
+  </gazebo>
 
 </robot>
