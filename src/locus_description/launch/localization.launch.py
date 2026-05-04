@@ -6,32 +6,52 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 
 
-def generate_launch_description():
+ def generate_launch_description():
+
 
     pkg = get_package_share_directory('locus_description')
 
-    map_file      = os.path.join(
+
+    map_file = os.path.join(
+
         os.path.expanduser('~'),
+
         'ros_projects', 'LOCUS', 'maps', 'locus_map.yaml'
+
     )
+
     amcl_config   = os.path.join(pkg, 'config', 'amcl.yaml')
 
-    # ------------------------------------------------------------------
-    # 1. Map Server — loads the saved map and publishes /map topic
-    #    Lifecycle node: must be configured and activated
-    # ------------------------------------------------------------------
-    map_server = LifecycleNode(
-        package='nav2_map_server',
-        executable='map_server',
-        name='map_server',
-        namespace='',
-        parameters=[{
-            'use_sim_time': True,
-            'yaml_filename': map_file
-        }],
-        output='screen'
-    )
 
+    # ------------------------------------------------------------------
+
+    # 1. Map Server — loads the saved map and publishes /map topic
+
+    #    Lifecycle node: must be configured and activated
+
+    # ------------------------------------------------------------------
+
+    map_server = LifecycleNode(
+
+        package='nav2_map_server',
+
+        executable='map_server',
+
+        name='map_server',
+
+        namespace='',
+
+        parameters=[{
+
+            'use_sim_time': True,
+
+            'yaml_filename': map_file
+
+        }],
+
+        output='screen'
+
+    ) 
     # ------------------------------------------------------------------
     # 2. AMCL — particle filter localization
     #    Subscribes to /scan and /odom, publishes map->odom TF
