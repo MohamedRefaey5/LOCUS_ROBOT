@@ -1,0 +1,59 @@
+amcl:
+  ros__parameters:
+
+    # --- Particle Filter Settings ---
+    # min/max particles: more particles = more accurate but slower
+    min_particles: 500
+    max_particles: 2000
+
+    # How often to update the filter (seconds)
+    update_min_d: 0.2        # update after moving 0.2m
+    update_min_a: 0.5        # update after rotating 0.5 rad (~28 degrees)
+
+    # Resample particles every N filter updates
+    resample_interval: 1
+
+    # --- Laser Model Settings ---
+    laser_model_type: likelihood_field   # best for indoor environments
+    laser_max_range: 12.0               # must match your lidar max range
+    laser_min_range: 0.15               # must match your lidar min range
+    max_beams: 60                       # how many beams to use (subset of 360)
+
+    # Likelihood field model parameters
+    laser_likelihood_max_dist: 2.0      # max distance for obstacle inflation
+    sigma_hit: 0.2                      # std dev of hit model
+    z_hit: 0.5                          # weight for hit model
+    z_rand: 0.5                         # weight for random model
+
+    # --- Motion Model Settings ---
+    robot_model_type: nav2_amcl::DifferentialMotionModel
+
+    # How much noise to add to odometry (tune if localization drifts)
+    alpha1: 0.2   # rotation noise from rotation
+    alpha2: 0.2   # rotation noise from translation
+    alpha3: 0.2   # translation noise from translation
+    alpha4: 0.2   # translation noise from rotation
+
+    # --- Frame Settings ---
+    base_frame_id: base_footprint
+    odom_frame_id: odom
+    global_frame_id: map
+    scan_topic: /scan
+
+    # --- Initial Pose ---
+    # Robot starts at origin facing forward
+    # If your robot spawns elsewhere update these
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+    # --- Map Settings ---
+    map_topic: /map
+
+    # --- Timing ---
+    use_sim_time: true
+    transform_tolerance: 1.0
+    tf_broadcast: true
