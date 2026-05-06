@@ -44,7 +44,7 @@ def generate_launch_description():
             package='nav2_controller',
             executable='controller_server',
             name='controller_server',
-            parameters=[nav2_params],
+            parameters=[nav2_params, {'yaml_filename': map_file}],
             remappings=[('cmd_vel', '/diff_drive_controller/cmd_vel')],
             output='screen'
         ),
